@@ -1,0 +1,5 @@
+reorder_imports = true
+# These 2 are not yet stable and require nightly
+# They provide a deterministic import formatting and are super useful to avoid random diffs when working in a team
+imports_granularity = "Crate"
+group_imports = "One"
