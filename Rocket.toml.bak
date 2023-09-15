@@ -1,0 +1,9 @@
+[default]
+address = "127.0.0.1"
+port = 6001
+cli_colors = true
+ident = "neolatino-api"
+
+[default.tls]
+certs = "path/to/cert-chain.pem"
+key = "path/to/key.pem"
