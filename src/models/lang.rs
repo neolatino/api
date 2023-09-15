@@ -1,4 +1,5 @@
-use enum_map::{Enum, EnumMap};
+use enum_map::Enum;
+use rocket::FromFormField;
 use rocket_okapi::JsonSchema;
 use serde::{Deserialize, Serialize};
 use std::fmt::Debug;
@@ -17,6 +18,7 @@ use strum::{Display, EnumIter, IntoEnumIterator};
     EnumIter,
     Display,
     Hash,
+    FromFormField,
 )]
 pub enum LanguageCode {
     #[serde(rename = "LAT")]
@@ -63,29 +65,6 @@ impl Language {
     pub fn entries() -> Vec<Language> {
         LanguageCode::iter()
             .map(|code| Language::new(code, code.to_string()))
-            .collect()
-    }
-}
-
-#[derive(Serialize, JsonSchema, Clone, Debug)]
-pub struct LanguageItem<T: Serialize + JsonSchema + Clone + Debug> {
-    pub code: LanguageCode,
-    pub value: T,
-}
-
-pub trait IntoLanguageItem {
-    type Item;
-    fn into_vec(self) -> Vec<LanguageItem<Self::Item>>
-    where
-        <Self as IntoLanguageItem>::Item: Serialize + JsonSchema + Clone + Debug;
-}
-
-impl<T: Serialize + JsonSchema + Clone + Debug> IntoLanguageItem for EnumMap<LanguageCode, T> {
-    type Item = T;
-
-    fn into_vec(self) -> Vec<LanguageItem<Self::Item>> {
-        self.into_iter()
-            .map(|(code, value)| LanguageItem { code, value })
             .collect()
     }
 }

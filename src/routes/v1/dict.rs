@@ -1,11 +1,11 @@
 use crate::{
     error::{api_response, ApiResponse},
-    models::{DictionaryHandle, IntoLanguageItem, Language, LanguageItem},
+    models::{Counters, DictionaryHandle, Entry, Language, LanguageCode},
 };
 use chrono::{DateTime, Utc};
-use rocket::{get, State};
+use rocket::{get, post, serde::json::Json, State};
 use rocket_okapi::{openapi, JsonSchema};
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 
 #[openapi]
 #[get("/languages")]
@@ -16,8 +16,7 @@ pub async fn get_languages() -> ApiResponse<Vec<Language>> {
 #[derive(Debug, Serialize, JsonSchema)]
 pub struct GetStatusResponse {
     pub last_update: DateTime<Utc>,
-    pub total_entries: u32,
-    pub lang_progress: Vec<LanguageItem<u32>>,
+    pub counters: Counters,
 }
 
 #[openapi]
@@ -26,10 +25,45 @@ pub async fn get_status(dict: &State<DictionaryHandle>) -> ApiResponse<GetStatus
     api_response(|| async {
         let dict = dict.read().await;
         Ok(GetStatusResponse {
-            last_update: dict.last_update.clone(),
-            total_entries: dict.counters.total,
-            lang_progress: dict.counters.lang_total.clone().into_vec(),
+            last_update: dict.last_update,
+            counters: dict.counters.clone(),
         })
+    })
+    .await
+}
+#[openapi]
+#[get("/entry/<id>")]
+pub async fn get_entry(dict: &State<DictionaryHandle>, id: u32) -> ApiResponse<Entry> {
+    api_response(|| async {
+        let dict = dict.read().await;
+        dict.get_entry(id)
+    })
+    .await
+}
+
+#[derive(Serialize, Deserialize, JsonSchema)]
+pub struct SearchFilters {
+    #[serde(default)]
+    text: Option<String>,
+    #[serde(default)]
+    text_lang: Vec<LanguageCode>,
+    #[serde(default)]
+    sem_id: Option<u32>,
+}
+
+#[openapi]
+#[post("/search", data = "<filters>")]
+pub async fn post_search(
+    dict: &State<DictionaryHandle>,
+    filters: Json<SearchFilters>,
+) -> ApiResponse<Vec<Entry>> {
+    api_response(|| async {
+        let dict = dict.read().await;
+        dict.search(
+            filters.text.clone(),
+            filters.text_lang.clone(),
+            filters.sem_id,
+        )
     })
     .await
 }

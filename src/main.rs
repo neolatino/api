@@ -1,8 +1,7 @@
 use crate::routes::*;
 use models::Dictionary;
-use rocket::get;
 use rocket_okapi::{
-    openapi, openapi_get_routes,
+    openapi_get_routes,
     swagger_ui::{make_swagger_ui, SwaggerUIConfig},
 };
 
@@ -14,7 +13,12 @@ const DICT_URL: &str = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCRUv8
 
 #[rocket::main]
 async fn main() -> anyhow::Result<()> {
-    let mut routes = openapi_get_routes![v1::dict::get_languages, v1::dict::get_status,];
+    let mut routes = openapi_get_routes![
+        v1::dict::get_languages,
+        v1::dict::get_status,
+        v1::dict::get_entry,
+        v1::dict::post_search,
+    ];
     routes.append(&mut make_swagger_ui(&get_docs()).into());
     // routes.append(&mut routes!(debug));
 
@@ -24,12 +28,6 @@ async fn main() -> anyhow::Result<()> {
     rocket.launch().await?;
 
     Ok(())
-}
-
-#[openapi]
-#[get("/")]
-fn index() -> String {
-    "Index".to_string()
 }
 
 fn get_docs() -> SwaggerUIConfig {

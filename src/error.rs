@@ -30,8 +30,8 @@ pub enum ApiError {
     MissingDictHeaders,
 
     // User Errors
-    #[error("Invalid symbol: `{0}`")]
-    InvalidSymbol(String),
+    #[error("Entry not found: `{0}`")]
+    EntryNotFound(u32),
 }
 
 impl<'r> Responder<'r, 'static> for ApiError {
@@ -45,7 +45,7 @@ impl<'r> Responder<'r, 'static> for ApiError {
             | ApiError::Csv(_)
             | ApiError::MissingDictHeaders
             | ApiError::ParseInt(_) => Status::InternalServerError.respond_to(request),
-            ApiError::InvalidSymbol(_) => status::BadRequest(Some(msg)).respond_to(request),
+            ApiError::EntryNotFound(_) => status::BadRequest(Some(msg)).respond_to(request),
         }
     }
 }

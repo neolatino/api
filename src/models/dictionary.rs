@@ -4,9 +4,9 @@ use crate::{
 };
 use chrono::{DateTime, Utc};
 use csv::StringRecord;
-use enum_map::EnumMap;
 use serde::Deserialize;
 use std::collections::HashMap;
+use strum::IntoEnumIterator;
 use tokio::sync::RwLock;
 
 pub type DictionaryHandle = RwLock<Dictionary>;
@@ -38,6 +38,47 @@ impl Dictionary {
         self.last_update = Utc::now();
         Ok(())
     }
+
+    pub fn get_entry(&self, id: u32) -> ApiResult<Entry> {
+        self.entries
+            .get(&id)
+            .ok_or(ApiError::EntryNotFound(id))
+            .cloned()
+    }
+
+    pub fn search(
+        &self,
+        text: Option<String>,
+        text_langs: Vec<LanguageCode>,
+        sem_id: Option<u32>,
+    ) -> ApiResult<Vec<Entry>> {
+        let langs = if text_langs.is_empty() {
+            LanguageCode::iter().collect()
+        } else {
+            text_langs
+        };
+
+        let filter = |e: &&Entry| -> bool {
+            let sem_filter = match (sem_id, e.sem_id) {
+                (Some(a), Some(b)) => a == b,
+                _ => true,
+            };
+
+            let text_filter = match &text {
+                Some(t) => e.matches(t, &langs),
+                None => false,
+            };
+
+            sem_filter && text_filter
+        };
+
+        Ok(self
+            .entries
+            .values()
+            .filter(filter)
+            .cloned()
+            .collect::<Vec<_>>())
+    }
 }
 
 async fn fetch_dict(url: &str) -> ApiResult<(HashMap<u32, Entry>, Counters)> {
@@ -58,11 +99,11 @@ async fn fetch_dict(url: &str) -> ApiResult<(HashMap<u32, Entry>, Counters)> {
     fn read_int(r: &StringRecord, index: usize) -> Result<u32, ApiError> {
         Ok(r.get(index)
             .ok_or(ApiError::MissingDictHeaders)?
-            .replace(".", "")
+            .replace('.', "")
             .parse()?)
     }
 
-    let raw_counters = RawCounters {
+    let counters = Counters {
         total: read_int(&r_counters, 0)?,
         sem: read_int(&r_counters, 1)?,
         lat: read_int(&r_counters, 8)?,
@@ -80,19 +121,16 @@ async fn fetch_dict(url: &str) -> ApiResult<(HashMap<u32, Entry>, Counters)> {
         frk: read_int(&r_counters, 20)?,
         sla: read_int(&r_counters, 21)?,
     };
-    let counters = Counters::from(raw_counters);
     println!("{:?}", counters);
 
     let _ = records.next();
 
     println!("Reading entries");
 
-    for r in records {
-        if let Ok(r) = r {
-            if let Ok(r) = r.deserialize::<RawEntry>(None) {
-                if let Ok(r) = Entry::try_from(r) {
-                    entries.insert(r.id, r);
-                }
+    for r in records.flatten() {
+        if let Ok(r) = r.deserialize::<RawEntry>(None) {
+            if let Ok(r) = Entry::try_from(r) {
+                entries.insert(r.id, r);
             }
         }
     }
@@ -104,7 +142,7 @@ async fn fetch_dict(url: &str) -> ApiResult<(HashMap<u32, Entry>, Counters)> {
 #[derive(Deserialize, Debug)]
 pub struct RawEntry {
     pub id: u32,
-    pub sem: Option<u32>,
+    pub sem_id: Option<u32>,
     pub category: Option<String>,
     pub topic: Option<String>,
     pub sub_topic: Option<String>,
@@ -131,68 +169,25 @@ impl TryFrom<RawEntry> for Entry {
     type Error = ApiError;
 
     fn try_from(r: RawEntry) -> Result<Self, Self::Error> {
-        let mut data = EnumMap::default();
-        data[LanguageCode::NeoLatino] = r.lat;
-        data[LanguageCode::InterRomanico] = r.iro;
-        data[LanguageCode::Portuguese] = r.por;
-        data[LanguageCode::Spanish] = r.spa;
-        data[LanguageCode::Catalan] = r.cat;
-        data[LanguageCode::Occitan] = r.occ;
-        data[LanguageCode::French] = r.fra;
-        data[LanguageCode::Sardinian] = r.srd;
-        data[LanguageCode::Italian] = r.ita;
-        data[LanguageCode::Romanian] = r.rom;
-        data[LanguageCode::English] = r.eng;
-        data[LanguageCode::Folksprak] = r.fol;
-        data[LanguageCode::Frenkisch] = r.frk;
-        data[LanguageCode::InterSlavic] = r.sla;
-
-        Ok(Entry { id: r.id, data })
-    }
-}
-
-#[derive(Deserialize, Debug)]
-pub struct RawCounters {
-    pub total: u32,
-    pub sem: u32,
-    pub lat: u32,
-    pub iro: u32,
-    pub por: u32,
-    pub spa: u32,
-    pub cat: u32,
-    pub occ: u32,
-    pub fra: u32,
-    pub srd: u32,
-    pub ita: u32,
-    pub rom: u32,
-    pub eng: u32,
-    pub fol: u32,
-    pub frk: u32,
-    pub sla: u32,
-}
-
-impl From<RawCounters> for Counters {
-    fn from(r: RawCounters) -> Self {
-        let mut lang = EnumMap::default();
-        lang[LanguageCode::NeoLatino] = r.lat;
-        lang[LanguageCode::InterRomanico] = r.iro;
-        lang[LanguageCode::Portuguese] = r.por;
-        lang[LanguageCode::Spanish] = r.spa;
-        lang[LanguageCode::Catalan] = r.cat;
-        lang[LanguageCode::Occitan] = r.occ;
-        lang[LanguageCode::French] = r.fra;
-        lang[LanguageCode::Sardinian] = r.srd;
-        lang[LanguageCode::Italian] = r.ita;
-        lang[LanguageCode::Romanian] = r.rom;
-        lang[LanguageCode::English] = r.eng;
-        lang[LanguageCode::Folksprak] = r.fol;
-        lang[LanguageCode::Frenkisch] = r.frk;
-        lang[LanguageCode::InterSlavic] = r.sla;
-
-        Counters {
-            total: r.total,
-            sem_total: r.sem,
-            lang_total: lang,
-        }
+        Ok(Entry {
+            id: r.id,
+            sem_id: r.sem_id,
+            essential_flag: matches!(r.essential_flag, Some(s) if s == "e"),
+            basic_flag: matches!(r.basic_flag, Some(s) if s == "b"),
+            lat: r.lat,
+            iro: r.iro,
+            por: r.por,
+            spa: r.spa,
+            cat: r.cat,
+            occ: r.occ,
+            fra: r.fra,
+            srd: r.srd,
+            ita: r.ita,
+            rom: r.rom,
+            eng: r.eng,
+            fol: r.fol,
+            frk: r.frk,
+            sla: r.sla,
+        })
     }
 }
