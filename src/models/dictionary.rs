@@ -61,12 +61,13 @@ impl Dictionary {
         let filter = |e: &&Entry| -> bool {
             let sem_filter = match (sem_id, e.sem_id) {
                 (Some(a), Some(b)) => a == b,
+                (Some(_), None) => false,
                 _ => true,
             };
 
             let text_filter = match &text {
                 Some(t) => e.matches(t, &langs),
-                None => false,
+                None => true,
             };
 
             sem_filter && text_filter
