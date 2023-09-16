@@ -1,10 +1,11 @@
 use crate::{
     error::{ApiError, ApiResult},
-    models::{Counters, Entry, LanguageCode},
+    models::{Counters, Entry, LanguageCode, Topic},
 };
 use chrono::{DateTime, Utc};
 use csv::StringRecord;
-use serde::Deserialize;
+use serde::{Deserialize, Deserializer};
+use serde_json::Value;
 use std::collections::HashMap;
 use strum::IntoEnumIterator;
 use tokio::sync::RwLock;
@@ -51,6 +52,7 @@ impl Dictionary {
         text: Option<String>,
         text_langs: Vec<LanguageCode>,
         sem_id: Option<u32>,
+        topics: Vec<Topic>,
     ) -> ApiResult<Vec<Entry>> {
         let langs = if text_langs.is_empty() {
             LanguageCode::iter().collect()
@@ -65,12 +67,18 @@ impl Dictionary {
                 _ => true,
             };
 
+            let topic_filter = if topics.is_empty() {
+                true
+            } else {
+                e.topic.map_or(false, |t| topics.contains(&t))
+            };
+
             let text_filter = match &text {
                 Some(t) => e.matches(t, &langs),
                 None => true,
             };
 
-            sem_filter && text_filter
+            sem_filter && topic_filter && text_filter
         };
 
         Ok(self
@@ -145,7 +153,8 @@ pub struct RawEntry {
     pub id: u32,
     pub sem_id: Option<u32>,
     pub category: Option<String>,
-    pub topic: Option<String>,
+    #[serde(deserialize_with = "ok_or_default")]
+    pub topic: Option<Topic>,
     pub sub_topic: Option<String>,
     pub sub_sub_topic: Option<String>,
     pub essential_flag: Option<String>,
@@ -166,6 +175,15 @@ pub struct RawEntry {
     pub sla: Option<String>,
 }
 
+fn ok_or_default<'a, T, D>(deserializer: D) -> Result<T, D::Error>
+where
+    T: Deserialize<'a> + Default,
+    D: Deserializer<'a>,
+{
+    let v: Value = Deserialize::deserialize(deserializer)?;
+    Ok(T::deserialize(v).unwrap_or_default())
+}
+
 impl TryFrom<RawEntry> for Entry {
     type Error = ApiError;
 
@@ -173,6 +191,7 @@ impl TryFrom<RawEntry> for Entry {
         Ok(Entry {
             id: r.id,
             sem_id: r.sem_id,
+            topic: r.topic,
             essential_flag: matches!(r.essential_flag, Some(s) if s == "e"),
             basic_flag: matches!(r.basic_flag, Some(s) if s == "b"),
             lat: r.lat,

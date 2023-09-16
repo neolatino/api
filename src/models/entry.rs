@@ -1,4 +1,4 @@
-use crate::models::LanguageCode;
+use crate::models::{LanguageCode, Topic};
 use schemars::JsonSchema;
 use serde::{Deserialize, Serialize};
 
@@ -7,22 +7,36 @@ pub struct Entry {
     pub id: u32,
     pub sem_id: Option<u32>,
     // pub cat_gram: CatGram,
-    // pub theme: Theme,
+    pub topic: Option<Topic>,
     pub essential_flag: bool,
     pub basic_flag: bool,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub lat: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub iro: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub por: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub spa: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub cat: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub occ: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub fra: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub srd: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub ita: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub rom: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub eng: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub fol: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub frk: Option<String>,
+    #[serde(skip_serializing_if = "Option::is_none")]
     pub sla: Option<String>,
 }
 

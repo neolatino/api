@@ -10,7 +10,7 @@ mod models;
 mod routes;
 
 const DICT_URL: &str = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCRUv8z5VSCk7lBy_4gtH2PkFvMH5ny65qauUmYzqWinGEw23IAQT_1seyBGfqw/pub?gid=1315031947&single=true&output=csv";
-const THEMES_URL: &str = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCRUv8z5VSCk7lBy_4gtH2PkFvMH5ny65qauUmYzqWinGEw23IAQT_1seyBGfqw/pub?gid=579611693&single=true&output=csv";
+// const THEMES_URL: &str = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSGCRUv8z5VSCk7lBy_4gtH2PkFvMH5ny65qauUmYzqWinGEw23IAQT_1seyBGfqw/pub?gid=579611693&single=true&output=csv";
 
 #[rocket::main]
 async fn main() -> anyhow::Result<()> {

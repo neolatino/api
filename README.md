@@ -20,14 +20,25 @@ The API is free to use and can be accessed at [neolatino-api.aldor.io](https://n
 - [x] status and progress counters (/status)
 - [x] languages (/languages)
 - [x] individual entry fetching (/entry/<id>)
+- [x] topic
+- [ ] subtopic
+- [ ] subsubtopic
+- [ ] grammatical category
 - [x] search by
   - [x] semantic id
   - [x] text
   - [x] language
-  - [ ] topic
+  - [x] topic
+  - [ ] subtopic
+  - [ ] subsubtopic
   - [ ] grammatical category
-- [ ] topics
-- [ ] grammatical category
+
 
 #### Conjugation
-- [ ] not started
+- [ ] basic forms
+  - [ ] 1st group
+  - [ ] 2nd group
+  - [ ] 3rd group
+  - [ ] 4th group
+- [ ] main irregular verbs
+- [ ] other exceptions

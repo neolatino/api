@@ -1,6 +1,7 @@
 use rocket_okapi::JsonSchema;
 use serde::Serialize;
 
+/// The number of words in each language
 #[derive(Debug, Clone, PartialEq, Eq, Default, Serialize, JsonSchema)]
 pub struct Counters {
     pub total: u32,

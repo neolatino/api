@@ -1,6 +1,6 @@
 use crate::{
     error::{api_response, ApiResponse},
-    models::{Counters, DictionaryHandle, Entry, Language, LanguageCode},
+    models::{Counters, DictionaryHandle, Entry, Language, LanguageCode, Topic},
 };
 use chrono::{DateTime, Utc};
 use rocket::{get, post, serde::json::Json, State};
@@ -49,6 +49,8 @@ pub struct SearchFilters {
     text_lang: Vec<LanguageCode>,
     #[serde(default)]
     sem_id: Option<u32>,
+    #[serde(default)]
+    topics: Vec<Topic>,
 }
 
 #[openapi]
@@ -63,6 +65,7 @@ pub async fn post_search(
             filters.text.clone(),
             filters.text_lang.clone(),
             filters.sem_id,
+            filters.topics.clone(),
         )
     })
     .await
