@@ -22,7 +22,7 @@ The REST API is free to use and hosted at [neolatino-api.aldor.io](https://neola
 #### Dictionary
 - [x] status and progress counters (/status)
 - [x] languages (/languages)
-- [x] individual entry fetching (/entry/<id>)
+- [x] individual entry fetching (/entry/\<id\>)
 - [x] topic
 - [ ] subtopic
 - [ ] subsubtopic
