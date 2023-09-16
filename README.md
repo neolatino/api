@@ -13,3 +13,21 @@ This is the ground work for building a much better dictionary than the current o
 ## Usage
 
 The API is free to use and can be accessed at [neolatino-api.aldor.io](https://neolatino-api.aldor.io)
+
+## Features
+
+#### Dictionary
+- [x] status and progress counters (/status)
+- [x] languages (/languages)
+- [x] individual entry fetching (/entry/<id>)
+- [x] search by
+  - [x] semantic id
+  - [x] text
+  - [x] language
+  - [ ] topic
+  - [ ] grammatical category
+- [ ] topics
+- [ ] grammatical category
+
+#### Conjugation
+- [ ] not started
