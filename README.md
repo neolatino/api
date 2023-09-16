@@ -7,7 +7,7 @@ Visit the Github [Neolatino homepage](https://github.com/neolatino)
 
 ---
 
-A work in progress general API to simplify the developement of tools/applications using dictionary or conjugation data.
+A work in progress general REST API to simplify the developement of tools/applications using dictionary or conjugation data.
 
 This is the groundwork for building much better dictionaries than the current one (including features like semantic, grammatical and topic search as well as verb conjugation).
 
@@ -15,7 +15,7 @@ It is also a way to try to decentralise the creation of tools/apps with a common
 
 ## Usage
 
-The API is free to use and hosted at [neolatino-api.aldor.io](https://neolatino-api.aldor.io)
+The REST API is free to use and hosted at [neolatino-api.aldor.io](https://neolatino-api.aldor.io)
 
 ## Features
 
@@ -35,7 +35,6 @@ The API is free to use and hosted at [neolatino-api.aldor.io](https://neolatino-
   - [ ] subtopic
   - [ ] subsubtopic
   - [ ] grammatical category
-
 
 #### Conjugation
 - [ ] basic forms
