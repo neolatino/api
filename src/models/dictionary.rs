@@ -103,7 +103,6 @@ async fn fetch_dict(url: &str) -> ApiResult<(HashMap<u32, Entry>, Counters)> {
 
     println!("Reading counters");
     let r_counters = records.next().ok_or(ApiError::MissingDictHeaders)??;
-    println!("{:?}", r_counters);
 
     fn read_int(r: &StringRecord, index: usize) -> Result<u32, ApiError> {
         Ok(r.get(index)
