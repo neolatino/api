@@ -9,7 +9,7 @@ Visit the Github [Neolatino homepage](https://github.com/neolatino)
 
 A work in progress general API to simplify the developement of tools/applications using dictionary or conjugation data.
 
-This is the groundwork for building much better dictionaries than the current one (including features like semantic search and verb conjugation).
+This is the groundwork for building much better dictionaries than the current one (including features like semantic, grammatical and topic search as well as verb conjugation).
 
 It is also a way to try to decentralise the creation of tools/apps with a common shared datasource.
 
