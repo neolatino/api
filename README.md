@@ -1,4 +1,5 @@
-# Neolatino API
+# Neolatino API 
+![rust checks](https://github.com/neolatino/neolatino-api/actions/workflows/rust.yml/badge.svg?branch=master)
 
 > Neolatino is a pan-Romance language proposed as a standard language for Romance as a whole, to ease communication amongst or with speakers of Romance languages, complementing (not substituting) the standards that exist locally (Portuguese, Spanish, etc.). In addition to its intended role in the Latin world, Neolatino is proposed to build an alternative language policy for Europe in combination with interlanguages for other language families (like Interslavic).
 
