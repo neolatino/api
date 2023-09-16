@@ -20,9 +20,9 @@ The REST API is free to use and hosted at [neolatino-api.aldor.io](https://neola
 ## Features
 
 #### Dictionary
-- [x] status and progress counters (/status)
-- [x] languages (/languages)
-- [x] individual entry fetching (/entry/\<id\>)
+- [x] status and progress counters
+- [x] languages
+- [x] individual entry fetching 
 - [x] topic
 - [ ] subtopic
 - [ ] subsubtopic
